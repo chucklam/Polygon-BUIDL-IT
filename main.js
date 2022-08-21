@@ -1,21 +1,29 @@
 const ohm = require('ohm-js');
 
-const arithmetic = ohm.grammar(`
+const source = String.raw`
   Arithmetic {
-    AddExp = AddExp "+" MulExp  -- plus
-           | AddExp "-" MulExp  -- minus
-           | MulExp
+    Exp
+      = AddExp
 
-    MulExp = MulExp "*" number  -- times
-           | MulExp "/" number  -- div
-           | number
+    AddExp
+      = AddExp "+" MulExp  -- plus
+      | AddExp "-" MulExp  -- minus
+      | MulExp
 
-    number = digit+
+    MulExp
+      = MulExp "*" number  -- times
+      | MulExp "/" number  -- div
+      | number
+
+    number (a number)
+      = digit+
   }
-`);
+`;
+const arithmetic = ohm.grammar(source);
 
 const semantics = arithmetic.createSemantics();
 semantics.addOperation('eval', {
+  // Exp(e) { return e.eval() }, // This "pass-through action" is implied.
   AddExp_plus(a, _, b) { return a.eval() + b.eval() },
   AddExp_minus(a, _, b) { return a.eval() - b.eval() },
   MulExp_times(a, _, b) { return a.eval() * b.eval() },
