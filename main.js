@@ -1,32 +1,8 @@
+const fs = require('fs');
+const { join } = require('path');
 const ohm = require('ohm-js');
 
-const source = String.raw`
-  Arithmetic {
-    Exp
-      = AddExp
-
-    AddExp
-      = AddExp "+" MulExp  -- plus
-      | AddExp "-" MulExp  -- minus
-      | MulExp
-
-    MulExp
-      = MulExp "*" PriExp  -- times
-      | MulExp "/" PriExp  -- div
-      | PriExp
-
-    PriExp
-      = "(" Exp ")"  -- paren
-      | MemExp
-
-    MemExp
-      = "m[" number "]"  -- memory
-      | number
-
-    number (a number)
-      = digit+
-  }
-`;
+const source = fs.readFileSync(join(__dirname, 'arithmetic.ohm'));
 const arithmetic = ohm.grammar(source);
 
 const memory = [1, 2, 3, 4, 5, 6, 7, 8, 9, 0];

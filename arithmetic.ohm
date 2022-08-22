@@ -1,0 +1,25 @@
+Arithmetic {
+  Exp
+    = AddExp
+
+  AddExp
+    = AddExp "+" MulExp  -- plus
+    | AddExp "-" MulExp  -- minus
+    | MulExp
+
+  MulExp
+    = MulExp "*" PriExp  -- times
+    | MulExp "/" PriExp  -- div
+    | PriExp
+
+  PriExp
+    = "(" Exp ")"  -- paren
+    | MemExp
+
+  MemExp
+    = "m[" number "]"  -- memory
+    | number
+
+  number (a number)
+    = digit+
+}
