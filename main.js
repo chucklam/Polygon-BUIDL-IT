@@ -61,7 +61,12 @@ const result = [
 semantics.addAttribute('masm', {
   AddExp_plus:  (a, _, b) => [...a.masm, ...b.masm, 'u32checked_add'],
   AddExp_minus: (a, _, b) => [...a.masm, ...b.masm, 'u32checked_sub'],
+  MulExp_times: (a, _, b) => [...a.masm, ...b.masm, 'u32checked_mul'],
+  MulExp_div:   (a, _, b) => [...a.masm, ...b.masm, 'u32checked_div'],
   PriExp_paren: (_l, a, _r) => a.masm,
+
+  // TODO
+  // MemExp_memory: (_l, a, _r) => memory[a.eval()],
 
   number(_) { return [`push.${this.sourceString}`] },
 
@@ -74,7 +79,7 @@ semantics.addAttribute('masm', {
   }
 });
 
-let matchResult = arithmetic.match('1 + (6 - 3) + 4');
+let matchResult = arithmetic.match('6 / 3 + (1 + 4) * 5');
 let node = semantics(matchResult);
 
 console.log(node.masm.join('\n'));
