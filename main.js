@@ -11,12 +11,8 @@ const source = String.raw`
       | MulExp
 
     MulExp
-      = MulExp "*" ExpExp  -- times
-      | MulExp "/" ExpExp  -- div
-      | ExpExp
-
-    ExpExp
-      = PriExp "^" ExpExp  -- power
+      = MulExp "*" PriExp  -- times
+      | MulExp "/" PriExp  -- div
       | PriExp
 
     PriExp
@@ -42,7 +38,6 @@ semantics.addOperation('eval', {
   AddExp_minus: (a, _, b) => a.eval() - b.eval(),
   MulExp_times: (a, _, b) => a.eval() * b.eval(),
   MulExp_div:   (a, _, b) => a.eval() / b.eval(),
-  ExpExp_power: (a, _, b) => Math.pow(a.eval(), b.eval()),
   PriExp_paren: (_l, a, _r) => a.eval(),
 
   MemExp_memory: (_l, a, _r) => memory[a.eval()],
@@ -52,10 +47,10 @@ semantics.addOperation('eval', {
 
 const result = [
   semantics(arithmetic.match('12345')).eval() == 12345,
-  semantics(arithmetic.match('100 + 1 * 2')).eval() == 102,
   semantics(arithmetic.match('1 + 2 - 3 + 4')).eval() == 4,
-  semantics(arithmetic.match('1 + 2 ^ 3')).eval() == 9,
-  semantics(arithmetic.match('(1 + 2) ^ 3')).eval() == 27,
+  semantics(arithmetic.match('4 / 2')).eval() == 2,
+  semantics(arithmetic.match('100 + 1 * 2')).eval() == 102,
+  semantics(arithmetic.match('(1 + 2) * 4')).eval() == 12,
   semantics(arithmetic.match('m[0] + 4 * m[2]')).eval() == 13,
 ];
 console.log(result);
