@@ -21,11 +21,11 @@ const source = String.raw`
 
     PriExp
       = "(" Exp ")"  -- paren
-      | ident
-      | number
+      | MemExp
 
-    ident (an identifier)
-      = letter alnum*
+    MemExp
+      = "m[" number "]"  -- memory
+      | number
 
     number (a number)
       = digit+
@@ -33,7 +33,7 @@ const source = String.raw`
 `;
 const arithmetic = ohm.grammar(source);
 
-const constants = {pi: Math.PI, e: Math.E};
+const memory = [1, 2, 3, 4, 5, 6, 7, 8, 9, 0];
 
 const semantics = arithmetic.createSemantics();
 semantics.addOperation('eval', {
@@ -45,11 +45,9 @@ semantics.addOperation('eval', {
   ExpExp_power(x, _, y)   { return Math.pow(x.eval(), y.eval()); },
   PriExp_paren(_l, a, _r) { return a.eval(); },
 
-  ident(_l, _ns) {
-    // Look up the value of a named constant, e.g., 'pi'.
-    return constants[this.sourceString] || 0;
-  },
-  number(_) { return parseFloat(this.sourceString) },
+  MemExp_memory(_l, a, _r) { return memory[a.eval()] },
+
+  number(_) { return parseInt(this.sourceString) },
 });
 
 const result = [
@@ -57,7 +55,7 @@ const result = [
   semantics(arithmetic.match('1 + 2 - 3 + 4')).eval() == 4,
   semantics(arithmetic.match('1 + 2 ^ 3')).eval() == 9,
   semantics(arithmetic.match('(1 + 2) ^ 3')).eval() == 27,
-  semantics(arithmetic.match('pi / pi')).eval() == 1,
   semantics(arithmetic.match('12345')).eval() == 12345,
+  semantics(arithmetic.match('m[0] + m[2]')).eval() == 4,
 ];
 console.log(result);
