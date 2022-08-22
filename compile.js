@@ -89,6 +89,11 @@ const code = [
   '',
   ...node.masm,
   '',
+  // Keep stack depth at 16. See
+  // https://github.com/maticnetwork/miden/issues/371
+  'swap',
+  'drop',
+  '',
   'end',
 ]
 const masm = code.join('\n');
