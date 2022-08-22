@@ -2,6 +2,12 @@ const fs = require('fs');
 const { join } = require('path');
 const ohm = require('ohm-js');
 
+if (process.argv.length === 2) {
+  console.error('Expected an arithmetic expression');
+  process.exit(1);
+}
+const expression = process.argv[2];
+
 const source = fs.readFileSync(join(__dirname, 'arithmetic.ohm'));
 const arithmetic = ohm.grammar(source);
 
@@ -50,12 +56,12 @@ semantics.addAttribute('masm', {
     if (children.length === 1) {
       return children[0].masm;
     } else {
-      throw new Error("Uh-oh, missing semantic action for " + this.constructor);
+      throw new Error("Missing semantic action for " + this.constructor);
     }
   }
 });
 
-let matchResult = arithmetic.match('6 / 3 + (1 + 4) * 5');
+let matchResult = arithmetic.match(expression);
 let node = semantics(matchResult);
 
 console.log(node.masm.join('\n'));
