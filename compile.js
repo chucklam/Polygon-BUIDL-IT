@@ -28,17 +28,17 @@ semantics.addOperation('eval', {
 
   number(_) { return parseInt(this.sourceString) },
 });
-
+/*
 const result = [
   semantics(arithmetic.match('12345')).eval() == 12345,
   semantics(arithmetic.match('1 + 2 - 3 + 4')).eval() == 4,
   semantics(arithmetic.match('4 / 2')).eval() == 2,
   semantics(arithmetic.match('100 + 1 * 2')).eval() == 102,
   semantics(arithmetic.match('(1 + 2) * 4')).eval() == 12,
-  semantics(arithmetic.match('m[0] + 4 * m[2]')).eval() == 13,
+  semantics(arithmetic.match('in[0] + 4 * in[2]')).eval() == 13,
 ];
-// console.log(result);
-
+console.log(result);
+*/
 // Define a 'masm' attribute to convert the given expression to Miden assembly code.
 semantics.addAttribute('masm', {
   AddExp_plus:  (a, _, b) => [...a.masm, ...b.masm, 'u32checked_add'],
@@ -47,8 +47,10 @@ semantics.addAttribute('masm', {
   MulExp_div:   (a, _, b) => [...a.masm, ...b.masm, 'u32checked_div'],
   PriExp_paren: (_l, a, _r) => a.masm,
 
-  // TODO
-  // MemExp_memory: (_l, a, _r) => memory[a.eval()],
+  MemExp_memory(_l, a, _r) {
+    const index = a.eval(); // TODO: See if we can parse the integer directly without eval()
+    return [`push.mem.${index}`];
+  },
 
   number(_) { return [`push.${this.sourceString}`] },
 
@@ -68,6 +70,23 @@ const code = [
   // Add opening setup
   'begin',
   '',
+  // 'pop.mem.15',
+  // 'pop.mem.14',
+  // 'pop.mem.13',
+  // 'pop.mem.12',
+  // 'pop.mem.11',
+  // 'pop.mem.10',
+  // 'pop.mem.9',
+  // 'pop.mem.8',
+  // 'pop.mem.7',
+  // 'pop.mem.6',
+  // 'pop.mem.5',
+  // 'pop.mem.4',
+  'pop.mem.3',
+  'pop.mem.2',
+  'pop.mem.1',
+  'pop.mem.0',
+  '',
   ...node.masm,
   '',
   'end',
@@ -75,7 +94,7 @@ const code = [
 const masm = code.join('\n');
 
 try {
-  console.log(masm);
+  // console.log(masm);
   const outfile = join(__dirname, 'main.masm');
   fs.writeFileSync(outfile, masm);
   console.log(`Executable Miden assembly code is written to ${outfile}`);

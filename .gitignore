@@ -129,5 +129,6 @@ dist
 .yarn/install-state.gz
 .pnp.*
 
-# Miden assembly output
+# Miden assembly code and input
 *.masm
+*.inputs

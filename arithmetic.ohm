@@ -17,7 +17,7 @@ Arithmetic {
     | MemExp
 
   MemExp
-    = "m[" number "]"  -- memory
+    = "in[" number "]"  -- memory
     | number
 
   number (a number)
