@@ -32,6 +32,8 @@ const arithmetic = ohm.grammar(source);
 const memory = [1, 2, 3, 4, 5, 6, 7, 8, 9, 0];
 
 const semantics = arithmetic.createSemantics();
+
+// Define an 'eval' operation to evaluate the given expression.
 semantics.addOperation('eval', {
   // Exp(e) { return e.eval() }, // This "pass-through action" is implied.
   AddExp_plus:  (a, _, b) => a.eval() + b.eval(),
@@ -53,4 +55,26 @@ const result = [
   semantics(arithmetic.match('(1 + 2) * 4')).eval() == 12,
   semantics(arithmetic.match('m[0] + 4 * m[2]')).eval() == 13,
 ];
-console.log(result);
+// console.log(result);
+
+// Define a 'masm' attribute to convert the given expression to Miden assembly code.
+semantics.addAttribute('masm', {
+  AddExp_plus:  (a, _, b) => [...a.masm, ...b.masm, 'u32checked_add'],
+  AddExp_minus: (a, _, b) => [...a.masm, ...b.masm, 'u32checked_sub'],
+  PriExp_paren: (_l, a, _r) => a.masm,
+
+  number(_) { return [`push.${this.sourceString}`] },
+
+  _nonterminal(...children) {
+    if (children.length === 1) {
+      return children[0].masm;
+    } else {
+      throw new Error("Uh-oh, missing semantic action for " + this.constructor);
+    }
+  }
+});
+
+let matchResult = arithmetic.match('1 + (6 - 3) + 4');
+let node = semantics(matchResult);
+
+console.log(node.masm.join('\n'));
