@@ -61,7 +61,24 @@ semantics.addAttribute('masm', {
   }
 });
 
-let matchResult = arithmetic.match(expression);
-let node = semantics(matchResult);
+const matchResult = arithmetic.match(expression);
+const node = semantics(matchResult);
 
-console.log(node.masm.join('\n'));
+const code = [
+  // Add opening setup
+  'begin',
+  '',
+  ...node.masm,
+  '',
+  'end',
+]
+const masm = code.join('\n');
+
+try {
+  console.log(masm);
+  const outfile = join(__dirname, 'main.masm');
+  fs.writeFileSync(outfile, masm);
+  console.log(`Executable Miden assembly code is written to ${outfile}`);
+} catch (err) {
+  console.error(err);
+}
